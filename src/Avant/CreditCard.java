@@ -1,6 +1,8 @@
 package Avant;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 class Account{
@@ -23,6 +25,7 @@ class Account{
 }
 public class CreditCard {
 	HashMap<Integer, Account> hash = new HashMap<>();
+	HashMap<Integer, List<String>> info = new HashMap<>();
 	
 	public void creatAccount() {
 		System.out.println("Please type in your account number. (Please type in an integer. eg: 1234)");
@@ -39,6 +42,9 @@ public class CreditCard {
 		
 		Account curtAccount = new Account(accountNumber, APR, creditLimit, 0, 0, 0, 0);
 		hash.put(accountNumber, curtAccount);
+		String message = "Account: " + accountNumber + " was created.";
+		info.put(accountNumber, new ArrayList<String>());
+		info.get(accountNumber).add(message);
 	}
 	
 	
@@ -70,6 +76,8 @@ public class CreditCard {
 		}
 		Account accountAfterCharge = new Account(curtAccount.accountNumber, curtAccount.APR, curtAccount.creditLimit, day, curtAmount, curtMonthInterest, prevMonthInterest);
 		hash.put(accountNumber, accountAfterCharge);
+		String message = "Account: " + accountNumber + " charged " + amount + " dollors " + day + " days after opening the account.";
+		info.get(accountNumber).add(message);
 		
 	}
 	public void payment() {
@@ -100,7 +108,8 @@ public class CreditCard {
 		}
 		Account accountAfterPayment = new Account(curtAccount.accountNumber, curtAccount.APR, curtAccount.creditLimit, day, curtAmount, curtMonthInterest, prevMonthInterest);
 		hash.put(accountNumber, accountAfterPayment);
-		
+		String message = "Account: " + accountNumber + " paid " + amount + " dollors " + day + " days after opening the account.";
+		info.get(accountNumber).add(message);
 	}
 	public void balance() {
 		System.out.println("Please type in the account number which you want to make a payment. (eg: 1234)");
@@ -121,7 +130,18 @@ public class CreditCard {
 			totalOutstandingBalance = curtAccount.curtAmount + (double)(day / 30 * 30 - curtAccount.curtday)* curtAccount.curtAmount * (curtAccount.APR / 100 / 365) + curtAccount.curtMonthInterest +curtAccount.prevMonthInterest;
 		}
 		totalOutstandingBalance = roundoff(totalOutstandingBalance);
-		System.err.println("The total outstanding balance is " + totalOutstandingBalance);
+		System.out.println("The total outstanding balance is " + totalOutstandingBalance);
+		System.out.println("\n");
+	}
+	public void getInfo() {
+		System.out.println("Please type in the account number which you want to track infomation. (eg: 1234)");
+		Scanner accountNumberScanner = new Scanner(System.in);
+		int accountNumber = accountNumberScanner.nextInt();
+		List<String> accountInfo = info.get(accountNumber);
+		for(String item : accountInfo) {
+			System.out.println(item);
+		}
+		System.out.println("\n");
 	}
 
 	public int numOfAccount() {

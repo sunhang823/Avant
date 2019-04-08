@@ -35,9 +35,10 @@ public class Main {
 		if(cc.numOfAccount() != 0) {
 			boolean trackAccount = true;
 			while(trackAccount) {
-				System.out.println("If you want to track a charge, please type in C.");
-				System.out.println("If you want to track a payment, please type in P.");
+				System.out.println("If you want to make a charge, please type in C.");
+				System.out.println("If you want to make a payment, please type in P.");
 				System.out.println("If you want to check the balance, please type in B.");
+				System.out.println("If you want to track infomation, please type in I");
 				System.out.println("If you want to end the system, please type in E.");
 				Scanner trackAccountScanner = new Scanner(System.in);
 				String trackAccountString = trackAccountScanner.nextLine();
@@ -47,6 +48,8 @@ public class Main {
 					cc.payment();
 				}else if(trackAccountString.equals("B")) {
 					cc.balance();
+				}else if(trackAccountString.equals("I")) {
+					cc.getInfo();
 				}else if(trackAccountString.equals("E")) {
 					System.out.println("Thank you! see you next time");
 					break;
