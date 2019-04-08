@@ -9,14 +9,16 @@ class Account{
 	double creditLimit;
 	int curtday;
 	double curtAmount;
-	double curtInterest;
-	public Account(int accountNumber, double APR, double creditLimit, int curtday, double curtAmount, double curtInterest) {
+	double curtMonthInterest;
+	double prevMonthInterest;
+	public Account(int accountNumber, double APR, double creditLimit, int curtday, double curtAmount, double curtMonthInterest, double prevMonthInterest) {
 		this.accountNumber = accountNumber;
 		this.APR = APR;
 		this.creditLimit = creditLimit;
 		this.curtday = curtday;
 		this.curtAmount = curtAmount;
-		this.curtInterest = curtInterest;
+		this.curtMonthInterest = curtMonthInterest;
+		this.prevMonthInterest = prevMonthInterest;
 	}
 }
 public class CreditCard {
@@ -35,7 +37,7 @@ public class CreditCard {
 		Scanner creditLimitScanner = new Scanner(System.in);
 		double creditLimit = creditLimitScanner.nextDouble();
 		
-		Account curtAccount = new Account(accountNumber, APR, creditLimit, 0, 0, 0);
+		Account curtAccount = new Account(accountNumber, APR, creditLimit, 0, 0, 0, 0);
 		hash.put(accountNumber, curtAccount);
 	}
 	
@@ -47,14 +49,27 @@ public class CreditCard {
 		
 		System.out.println("How much money you want to charge? (eg: 100)");
 		Scanner amountScanner = new Scanner(System.in);
-		int amount = amountScanner.nextInt();
+		double amount = amountScanner.nextDouble();
 		
 		System.out.println("How many days after the opening of the account? (eg: 10)");
 		Scanner dayScanner = new Scanner(System.in);
 		int day = dayScanner.nextInt();
 		
-		Account courtAccount = hash.get(accountNumber);
+		Account curtAccount = hash.get(accountNumber);
 		
+		double curtAmount = curtAccount.curtAmount + amount;
+		double curtMonthInterest = curtAccount.curtMonthInterest;
+		double prevMonthInterest = curtAccount.prevMonthInterest;
+		
+		if((curtAccount.curtday) / 30 == (day / 30)) {
+			curtMonthInterest = (day - curtAccount.curtday) * curtAccount.curtAmount * (curtAccount.APR / 100 / 365) + curtAccount.curtMonthInterest;
+			
+		}else {
+			curtMonthInterest = (double)(day - day / 30 * 30) * curtAccount.curtAmount * (curtAccount.APR / 100 / 365);
+			prevMonthInterest = (double)(day / 30 * 30 - curtAccount.curtday)* curtAccount.curtAmount * (curtAccount.APR / 100 / 365) + curtAccount.curtMonthInterest + curtAccount.prevMonthInterest;
+		}
+		Account accountAfterCharge = new Account(curtAccount.accountNumber, curtAccount.APR, curtAccount.creditLimit, day, curtAmount, curtMonthInterest, prevMonthInterest);
+		hash.put(accountNumber, accountAfterCharge);
 		
 	}
 	public void payment() {
@@ -64,13 +79,27 @@ public class CreditCard {
 		
 		System.out.println("How much money you want to pay? (eg: 100)");
 		Scanner amountScanner = new Scanner(System.in);
-		int amount = amountScanner.nextInt();
+		double amount = amountScanner.nextDouble();
 		
 		System.out.println("How many days after the opening of the account? (eg: 10)");
 		Scanner dayScanner = new Scanner(System.in);
 		int day = dayScanner.nextInt();
 		
-		Account courtAccount = hash.get(accountNumber);
+		Account curtAccount = hash.get(accountNumber);
+		
+		double curtAmount = curtAccount.curtAmount - amount;
+		double curtMonthInterest = curtAccount.curtMonthInterest;
+		double prevMonthInterest = curtAccount.prevMonthInterest;
+		
+		if((curtAccount.curtday) / 30 == (day / 30)) {
+			curtMonthInterest = (day - curtAccount.curtday) * curtAccount.curtAmount * (curtAccount.APR / 100 / 365) + curtAccount.curtMonthInterest;
+			
+		}else {
+			curtMonthInterest = (double)(day - day / 30 * 30) * curtAccount.curtAmount * (curtAccount.APR / 100 / 365);
+			prevMonthInterest = (double)(day / 30 * 30 - curtAccount.curtday)* curtAccount.curtAmount * (curtAccount.APR / 100 / 365) + curtAccount.curtMonthInterest + curtAccount.prevMonthInterest;
+		}
+		Account accountAfterPayment = new Account(curtAccount.accountNumber, curtAccount.APR, curtAccount.creditLimit, day, curtAmount, curtMonthInterest, prevMonthInterest);
+		hash.put(accountNumber, accountAfterPayment);
 		
 	}
 	public void balance() {
@@ -82,12 +111,26 @@ public class CreditCard {
 		Scanner dayScanner = new Scanner(System.in);
 		int day = dayScanner.nextInt();
 		
-		Account courtAccount = hash.get(accountNumber);
+		Account curtAccount = hash.get(accountNumber);
 		
+		double totalOutstandingBalance = 0;
+		if((curtAccount.curtday) / 30 == (day / 30)) {
+			totalOutstandingBalance = curtAccount.curtAmount + curtAccount.prevMonthInterest;
+			
+		}else {
+			totalOutstandingBalance = curtAccount.curtAmount + (double)(day / 30 * 30 - curtAccount.curtday)* curtAccount.curtAmount * (curtAccount.APR / 100 / 365) + curtAccount.curtMonthInterest +curtAccount.prevMonthInterest;
+		}
+		totalOutstandingBalance = roundoff(totalOutstandingBalance);
+		System.err.println("The total outstanding balance is " + totalOutstandingBalance);
 	}
 
 	public int numOfAccount() {
 		return hash.size();
+	}
+	
+	public double roundoff(double val) {
+		double roundoff = (double)Math.round(val * 100) / 100;
+		return roundoff;
 	}
 
 }
